@@ -114,7 +114,7 @@ def move_fairy(i):
 
     visit = [[False] * (C+1) for _ in range(R+3)]
     sr, sc = golem_coord[i]
-    cand = [sr+1]
+    cand = [sr]
     q = deque()
     q.append((sr, sc, i+1))
     visit[sr][sc] = True
@@ -129,13 +129,13 @@ def move_fairy(i):
             if abs(exit_graph[nr][nc]) == idx or (exit_graph[cr][cc] < 0 and abs(exit_graph[nr][nc]) != idx):
                 q.append((nr, nc, abs(exit_graph[nr][nc])))
                 visit[nr][nc] = True
-                cand.append(nr+1)
+                cand.append(nr)
 
 
     # print_2d_graph("visit", visit)
     # print_2d_graph("exit_graph", exit_graph)
     # print("candidate", cand, "res", max(cand)-3)
-    return max(cand)-3
+    return max(cand)-2
 
 def update_result(res):
     global result
