@@ -35,7 +35,7 @@ def check_movable(r, c):
     global forest
     if r > R or c < 1 or c > C:
         return False
-    if forest[r][c] != 0:
+    if r >= 1 and forest[r][c] != 0:
         return False
     return True
 
@@ -135,6 +135,7 @@ for idx, [r, c] in start_dict.items():
             # 골렘 출구 업데이트
         # 동쪽
         elif check_direction(r, c, 1) and check_movable(r+2, c+1) and check_movable(r+1, c+2):
+            # print_2d_graph("move right, forest", forest)
             move_golem(idx, r, c, 1)
             c += 1
             # 골렘 출구 업데이트
@@ -147,5 +148,5 @@ for idx, [r, c] in start_dict.items():
             else:
                 move_fairy(idx, r, c)
             break
-    # print_2d_graph("forest", forest)
+        # print_2d_graph("forest", forest)
 print(result)
