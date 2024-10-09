@@ -51,6 +51,12 @@ def check_direction(r, c, dir):
 
 def move_golem(idx, r, c, dir):
     if r <= 0:
+        cur_exit = exit_dict[idx]
+        if dir == 1:  # 동쪽 = 시계
+            cur_exit = (cur_exit + 1) % 4
+        elif dir == 3:  # 서쪽 = 반시계
+            cur_exit = (cur_exit + 3) % 4
+        exit_dict[idx] = cur_exit
         return
     global forest
     if dir == 1:  # 동
@@ -115,11 +121,13 @@ def move_fairy(idx, r, c):
                 visit[nr][nc] = True
                 cand.append(nr)
     res = max(cand)
+    print(f'idx : {idx}, res : {res}')
     update_result(res)
 
 def update_result(res):
     global result
     result += res
+
 
 
 for idx, [r, c] in start_dict.items():
@@ -148,5 +156,5 @@ for idx, [r, c] in start_dict.items():
             else:
                 move_fairy(idx, r, c)
             break
-        # print_2d_graph("forest", forest)
+    print_2d_graph(f"idx: {idx}, forest", forest)
 print(result)
