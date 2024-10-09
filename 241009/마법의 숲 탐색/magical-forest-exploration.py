@@ -121,7 +121,6 @@ def move_fairy(idx, r, c):
                 visit[nr][nc] = True
                 cand.append(nr)
     res = max(cand)
-    print(f'idx : {idx}, res : {res}')
     update_result(res)
 
 def update_result(res):
@@ -156,5 +155,5 @@ for idx, [r, c] in start_dict.items():
             else:
                 move_fairy(idx, r, c)
             break
-    print_2d_graph(f"idx: {idx}, forest", forest)
+    # print_2d_graph(f"idx: {idx}, forest", forest)
 print(result)
