@@ -32,6 +32,7 @@ exit_dict = {k: exit_list[k-1] for k in range(1, K+1)}
 result = 0
 
 def check_movable(r, c):
+    global forest
     if r > R or c < 1 or c > C:
         return False
     if forest[r][c] != 0:
@@ -67,6 +68,7 @@ def move_golem(idx, r, c, dir):
 
 
 def update_exit(idx, r, c, dir):
+    global forest
     cur_exit = exit_dict[idx]
     if dir == 1:  # 동쪽 = 시계
         cur_exit = (cur_exit + 1) % 4
