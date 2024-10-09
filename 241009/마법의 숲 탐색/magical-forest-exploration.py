@@ -106,7 +106,7 @@ def move_fairy(idx, r, c):
         for dr, dc in ((-1, 0), (1, 0), (0, 1), (0, -1)):
             nr = cr + dr
             nc = cc + dc
-            if nr < 1 or nr > R or nc < 1 or nc > C or visit[nr][nc]:
+            if nr < 1 or nr > R or nc < 1 or nc > C or visit[nr][nc] or forest[nr][nc] == 0:
                 continue
             if abs(forest[nr][nc]) == cidx or (forest[cr][cc] < 0 and abs(forest[nr][nc]) != cidx):
                 q.append((nr, nc, abs(forest[nr][nc])))
