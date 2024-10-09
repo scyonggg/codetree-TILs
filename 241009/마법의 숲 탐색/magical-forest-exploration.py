@@ -77,13 +77,13 @@ def update_exit(idx, r, c, dir):
     exit_dict[idx] = cur_exit
 
     if cur_exit == 0:  # 북
-        forest[r-1][c] *= -1
+        forest[r-1][c] = -idx
     elif cur_exit == 1:  # 동
-        forest[r][c+1] *= -1
+        forest[r][c+1] = -idx
     elif cur_exit == 2:  # 남
-        forest[r+1][c] *= -1
+        forest[r+1][c] = -idx
     elif cur_exit == 3:  # 서
-        forest[r][c-1] *= -1
+        forest[r][c-1] = -idx
 
 
 def inForest(r):
