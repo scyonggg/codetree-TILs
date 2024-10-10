@@ -132,8 +132,8 @@ def cal_value(rotated_graph):
         nonlocal visit
         global result
         q = deque()
-        path = [[_x, _y]]
-        length = 1
+        path = [[_x, _y]]  # 연결된 유물 좌표 기록.
+        length = 1  # 연결된 유물의 개수
         q.append((_x, _y, 1))
         visit[_y][_x] = 1
         while q:
@@ -148,20 +148,31 @@ def cal_value(rotated_graph):
                     visit[ny][nx] = 1
                     path.append([nx, ny])
                     length += 1
+        # 연결된 유물의 개수를 visit 배열에 업데이트
         for i, j in path:
             visit[j][i] = length
 
-        if length >= 3:
-            return path
-        return []
+        # 지나온 좌표 반환
+        # if length >= 3:
+        return path
 
     for i in range(5):
         for j in range(5):
             if visit[j][i] == 0:
                 _path = bfs(rotated_graph, i, j)
-                cnt += len(_path)
-                if len(_path) > 0:
+                # 지나온 길이 1개 or 2개일 경우 = 아무것도 연결되지 않음.
+                if len(_path) <= 2:
+                    continue
+                # 지나온 길이 3개 이상 = 총합 업데이트, 경로 반환. (벽면 업데이트 위해서)
+                if len(_path) >= 3:
+                    cnt += len(_path)
                     ret_path.extend(_path)
+
+    # 유물 3개 이상 연결되지 않음.
+    if len(ret_path) == 0:
+        # 연결된 유물이 아무것도 없음. -> 턴 상관없이 전체 종료.
+        global flag
+        flag = False
 
     print_2d_graph("rotated_graph", rotated_graph)
     print_2d_graph(f"cnt: {cnt}, visit", visit)
@@ -169,14 +180,11 @@ def cal_value(rotated_graph):
     return cnt, ret_path
 
 result = []
-flag = True
 for k in range(K):
-    if not flag:
-        break
     # 27개 후보 회전.
     cands = rotate_cand(graph)
     cnt = 0
-    # 유물 가치 계산
+    # 27개 후보 각각 유물 가치 계산
     max_len = 0
     max_idx = 0
     max_path = []
@@ -186,25 +194,36 @@ for k in range(K):
             max_idx = idx
             max_len = cand_len
             max_path = cand_path
+    if max_len == 0:
+        break
     max_path.sort(key=lambda x: x[1], reverse=True)
     max_path.sort(key=lambda x: x[0])
+    # 유물 가치 업데이트.
     cnt += max_len
+    # 27개 후보 중 가장 높은 유물 가치 선택.
     graph = cands[max_idx]
-    print_2d_graph("Graph after rotate, before removed", graph)
     while True:
-        # 유물 가치 계산
+        # 벽면에 써있는 숫자 업데이트
+        print_2d_graph("Before updated graph", graph)
         for idx, (px, py) in enumerate(max_path):
             graph[py][px] = nums.pop(0)
+        print_2d_graph("After updated graph", graph)
+        # 업데이트된 유적에서 유물 가치 계산.
         cand_len, cand_path = cal_value(graph)
-        cnt += cand_len
-        max_path = cand_path
+        # Case 1. 유물이 단 하나도 없을 때. (조각 연결 길이가 1~2일 때)
         if cand_len == 0:
-            # 이번 턴 종료. 다음 턴 진행.
             result.append(cnt)
             flag = False
             break
+        # Case 2. 유물이 3개 이상 연결은 되었을 때.
+        cand_path.sort(key=lambda x: x[1], reverse=True)
+        cand_path.sort(key=lambda x: x[0])
+        if cand_len < 3:
+            result.append(cnt)
+            break
+        cnt += cand_len
+        max_path = cand_path
 
-        print_2d_graph("Removed graph", graph)
 
 for res in result:
     print(res, end=" ")
