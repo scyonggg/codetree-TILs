@@ -14,6 +14,12 @@ def print_dict(text, _dict):
             print(f'{k}: {v}')
         print()
 
+def print_debug(*args):
+    if DEBUG:
+        for i in args:
+            print(i)
+        print()
+
 def sort_santas(_santas_list):
     # 우선 순위 : 1) r좌표 큰 산타, 2) c좌표 큰 산타.
     ret = sorted(_santas_list, key=lambda x: x[2], reverse=True)
@@ -73,17 +79,33 @@ def get_direction_santa(idx):
     global Rr, Rc
     _, Sr, Sc = santas_list[idx]
     dr = dc = 0
+    dist = 9999
     # dr, dc 방향에 비어있거나 루돌프가 있으면 됨.
-    if Rr < Sr and board[Sr-1][Sc] <= 0:  # 상
-        # 상으로 움직여도 루돌프에게 가까워질 수 있음.
-        return -1, 0
+    if Rc < Sc and in_board(Sr, Sc-1) and board[Sr][Sc-1] <= 0:  # 좌
+        cur_dist = get_distance(Rr, Rc, Sr, Sc-1)
+        if cur_dist <= dist:
+            dist = cur_dist
+            dr = 0
+            dc = -1
+    if Rr > Sr and in_board(Sr+1, Sc) and board[Sr+1][Sc] <= 0:  # 하
+        cur_dist = get_distance(Rr, Rc, Sr+1, Sc)
+        if cur_dist <= dist:
+            dist = cur_dist
+            dr = 1
+            dc = 0
+    if Rc > Sc and in_board(Sr, Sc+1) and board[Sr][Sc+1] <= 0:  # 우
+        cur_dist = get_distance(Rr, Rc, Sr, Sc+1)
+        if cur_dist <= dist:
+            dist = cur_dist
+            dr = 0
+            dc = 1
+    if Rr < Sr and in_board(Sr-1, Sc) and board[Sr-1][Sc] <= 0:  # 상
+        cur_dist = get_distance(Rr, Rc, Sr-1, Sc)
+        if cur_dist <= dist:
+            dist = cur_dist
+            dr = -1
+            dc = 0
         # 상으로 움직이더라도, 루돌프 방향으로 가까워질 수 없으면 움직이지 않음.
-    if Rc > Sc and board[Sr][Sc+1] <= 0:  # 우
-        return 0, 1
-    if Rr > Sr and board[Sr+1][Sc] <= 0:  # 하
-        return 1, 0
-    if Rc < Sc and board[Sr][Sc-1] <= 0:  # 좌
-        return 0, -1
     return dr, dc
 
 def get_direction_santa_v1(idx):
@@ -268,7 +290,7 @@ for m in range(M):
     move_rudolph(m, closest_idx, dr, dc)  # 루돌프 이동 완료, 산타 연쇄 충돌 완료.
 
     print_2d_graph(f"[Turn {m}], After rudolph", board)
-    # print(f'[Turn {m}, Rudolph], alive: \n {alive} \n , stun: \n {stun}\n, score: \n {score}\n, santas_list: \n {santas_list} \n')
+    print_debug(f'[Turn {m}, Rudolph], alive: \n {alive} \n , stun: \n {stun}\n, score: \n {score}\n, santas_list: \n {santas_list} \n')
     # 2. 1번부터 P번까지 산타 이동
     for p in range(1, P+1):
         # 탈락하거나 기절 중인 산타는 스킵
@@ -276,16 +298,16 @@ for m in range(M):
             continue
         ## 루돌프 방향 계산
         dr, dc = get_direction_santa(p)
-        # print(f'santa {p}, dr : {dr}, dc : {dc}')
+        print_debug(f'santa {p}, dr : {dr}, dc : {dc}')
         ## idx 산타가 루돌프로 공격.
         move_santa(m, p, dr, dc)
         print_2d_graph(f"[Turn {m}], After santa {p}", board)
-        # print(f'[Turn {m}, santa {p}], alive: \n {alive} \n , stun: \n {stun}\n, score: \n {score}\n, santas_list: \n {santas_list} \n' )
+        print_debug(f'[Turn {m}, santa {p}], alive: \n {alive} \n , stun: \n {stun}\n, score: \n {score}\n, santas_list: \n {santas_list} \n' )
 
     for k, v in score.items():
         if alive[k]:
             score[k] += 1
-    # print(f'[Turn {m} done.], alive: \n {alive} \n , stun: \n {stun}\n, score: \n {score}\n, santas_list: \n {santas_list} \n')
+    print_debug(f'[Turn {m} done.], alive: \n {alive} \n , stun: \n {stun}\n, score: \n {score}\n, santas_list: \n {santas_list} \n')
 
 for k, v in score.items():
     print(v, end=' ')
