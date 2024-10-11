@@ -55,7 +55,7 @@ def is_movable(i, d):
     # i번 기사가 d 방향으로 움직일 수 있는지 확인. (벽이 있는지, 범위를 벗어나지 않는지)
     r, c, h, w, k = knight_dict[i]  # i번 기사의 정보
     if d == 0:  # 위쪽
-        return in_board(r-1, c, h, w) and is_wall(r, c, h, w)
+        return in_board(r-1, c, h, w) and is_wall(r-1, c, h, w)
     elif d == 1:  # 오른쪽
         return in_board(r, c+1, h, w) and is_wall(r, c+1, h, w)
     elif d == 2:  # 아래쪽
@@ -147,7 +147,7 @@ print_2d_graph('knights', knights)
 print_dict('knight_dict', knight_dict)
 
 # Q개의 명령 실행.
-for command in commands:
+for ii, command in enumerate(commands):
     # 명령은 (i, d) 형태로 주어짐.
     i, d = command
     # i번 기사가 사라져있는지 확인.
@@ -158,8 +158,8 @@ for command in commands:
         continue
     move_knight(i, d, True)
 
-print_2d_graph('knights', knights)
-print_dict('knights_dict', knight_dict)
+    print_2d_graph(f'[Turn {ii}], knights', knights)
+    print_dict(f'[Turn {ii}], knights_dict', knight_dict)
 
 for _k, _v in knight_dict.items():
     r, c, h, w, k = _v
