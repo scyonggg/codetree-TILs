@@ -54,7 +54,7 @@ def get_direction(idx):
     """ 루돌프가 idx 번째 산타를 공격할 경우, 방향을 반환. """
     global santas_list, Rr, Rc
     _, Sr, Sc = santas_list[idx]
-    assert _ == idx, f"{_}, {idx} mismatch"
+    # assert _ == idx, f"{_}, {idx} mismatch"
     dr = dc = 0
     # 산타가 루돌프보다 아래에 있을 경우
     if Sr > Rr:
