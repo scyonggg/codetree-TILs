@@ -62,21 +62,42 @@ def get_direction(idx):
     _, Sr, Sc = santas_list[idx]
     # assert _ == idx, f"{_}, {idx} mismatch"
     dr = dc = 0
-    # 산타가 루돌프보다 아래에 있을 경우
-    if Sr > Rr:
-        dr = 1
-    elif Sr < Rr:
-        dr = -1
-    # 산타가 루돌프보다 오른쪽에 있을 경우
-    if Sc > Rc:
-        dc = 1
-    elif Sc < Rc:
-        dc = -1
+    dist = 9999
+    drlist = [-1, -1, 0, 1, 1, 1, 0, -1]
+    dclist = [0, 1, 1, 1, 0, -1, -1, -1]
+
+    for r, c in zip(drlist, dclist):
+        if in_board(Rr+r, Rc+c):
+            cur_dist = get_distance(Rr+r, Rc+c, Sr, Sc)
+            if cur_dist < dist:
+                dist = cur_dist
+                dr = r
+                dc = c
     return dr, dc
+
+    # # 산타가 루돌프보다 아래에 있을 경우
+    # if Sr > Rr:
+    #     if in_board(Rr+1, Rc):
+    #         cur_dist = get_distance(Rr+1, Rc, Sr, Sc)
+    #         if cur_dist < dist:
+    #             dist = cur_dist
+    #             dr = 1
+    # elif Sr < Rr:
+    #     if in_board(Rr-1, Rc):
+    #         cur_dist = get_distance(Rr-1, Rc, Sr, Sc)
+    #         if cur_dist < dist:
+    #             dist = cur_dist
+    #             dr = -1
+    # # 산타가 루돌프보다 오른쪽에 있을 경우
+    # if Sc > Rc:
+    #     dc = 1
+    # elif Sc < Rc:
+    #     dc = -1
+    # return dr, dc
 
 def get_direction_santa(idx):
     """idx 산타가 루돌프로 가기 위한 방향 리턴"""
-    global Rr, Rc
+    global santas_list, Rr, Rc
     _, Sr, Sc = santas_list[idx]
     dr = dc = 0
     dist = 9999
@@ -106,50 +127,6 @@ def get_direction_santa(idx):
             dr = -1
             dc = 0
         # 상으로 움직이더라도, 루돌프 방향으로 가까워질 수 없으면 움직이지 않음.
-    return dr, dc
-
-def get_direction_santa_v1(idx):
-    """idx 산타가 루돌프로 가기 위한 방향 리턴"""
-    global Rr, Rc
-    _, Sr, Sc = santas_list[idx]
-    dr = dc = 0
-    # dr, dc 방향에 비어있거나 루돌프가 있으면 됨.
-    if Rr < Sr and board[Sr-1][Sc] <= 0:  # 상
-        # 상으로 움직여도 루돌프에게 가까워질 수 있음.
-        Sr -= 1
-        # 루돌프와 겹침.
-        if (Rr == Sr and Rc == Sc) or \
-            (Rr < Sr and board[Sr-1][Sc] <= 0) or \
-            (Rc > Sc and board[Sr][Sc+1] <= 0) or \
-            (Rc < Sc and board[Sr][Sc-1] <= 0):
-            return -1, 0
-        Sr += 1
-        # 상으로 움직이더라도, 루돌프 방향으로 가까워질 수 없으면 움직이지 않음.
-    if Rc > Sc and board[Sr][Sc+1] <= 0:  # 우
-        Sc += 1
-        if (Rr == Sr and Rc == Sc) or \
-            (Rr < Sr and board[Sr-1][Sc] <= 0) or \
-                (Rc > Sc and board[Sr][Sc+1] <= 0) or \
-                (Rr > Sr and board[Sr+1][Sc] <= 0):
-            return 0, 1
-        Sc -= 1
-    if Rr > Sr and board[Sr+1][Sc] <= 0:  # 하
-        Sr += 1
-        if (Rr == Sr and Rc == Sc) or \
-            (Rc < Sc and board[Sr][Sc-1] <= 0) or \
-                (Rc > Sc and board[Sr][Sc+1] <= 0) or \
-                (Rr > Sr and board[Sr+1][Sc] <= 0):
-            return 1, 0
-        Sr -= 1
-    if Rc < Sc and board[Sr][Sc-1] <= 0:  # 좌
-        Sc -= 1
-        if (Rr == Sr and Rc == Sc) or \
-            (Rc < Sc and board[Sr][Sc-1] <= 0) or \
-                (Rr < Sr and board[Sr-1][Sc] <= 0) or \
-                (Rr > Sr and board[Sr+1][Sc] <= 0):
-            return 0, -1
-        Sc += 1
-
     return dr, dc
 
 def move_rudolph(m, idx, dr, dc):
@@ -260,20 +237,28 @@ N, M, P, C, D = map(int, input().split())
 Rr, Rc = map(int, input().split())
 board = [[0] * (N+1) for _ in range(N+1)]
 board[Rr][Rc] = -1
+print_2d_graph("Initial board", board)
 
 santas_list = [[0, -1, -1]]  # [idx, r, c]
 for _ in range(P):
     Pn, Sr, Sc = map(int, input().split())
     santas_list.append([Pn, Sr, Sc])
+santas_list.sort(key=lambda x: x[0])
 # print(santas_list)
 
 stun = {k: [False, 0] for k in range(1, P+1)}
 alive = {k: True for k in range(1, P+1)}
 score = {k: 0 for k in range(1, P+1)}
 
+print_debug('santas_list:', santas_list)
 for Si, Sr, Sc in santas_list:
+    if Si == 0:
+        continue
+    print_debug(f'Si: {Si}, Sr: {Sr}, Sc: {Sc}')
     board[Sr][Sc] = Si
 
+print_debug('rudolph: ', Rr, Rc)
+print_2d_graph("Initial board", board)
 # M턴 반복.
 # for m in range(M):
 for m in range(M):
@@ -284,6 +269,7 @@ for m in range(M):
     # 1. 루돌프 이동
     ## 루돌프와 가장 가까운 산타의 idx 확인
     closest_idx = get_closest_santa()
+    print_debug(f'[Turn {m}, Rudolph]. closest idx : {closest_idx}')
     ## idx 산타로 가기 위한 방향 계산
     dr, dc = get_direction(closest_idx)
     ## 루돌프가 idx 산타로 공격.
