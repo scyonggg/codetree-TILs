@@ -68,30 +68,32 @@ def get_direction(r, c):
     return ret
 
 def update_coords():
-    global coords
+    global coords, action
     coords = []
     for r in range(1, N+1):
         for c in range(1, N+1):
             if board[r][c][1] != 0:
                 coords.append([r, c])
+    coords.sort(key=lambda x: x[1])
+    coords.sort(key=lambda x: x[0])
+    action = [[0] * (N + 1) for _ in range(N + 1)]
 
 def move_person(idx, r, c, dr, dc):
-    global board, coords, result, exit
+    global board, coords, result, exit, action
     if (dr == 0 and dc == 0) or not in_board(r+dr, c+dc) or not check_wall(r+dr, c+dc):
         return
     if r+dr == exit[0] and c+dc == exit[1]:
-        coords[idx] = [0, 0]
-        result += 1
-        board[r][c][1] -= 1
+        # coords[idx] = [0, 0]
+        result += board[r][c][1]
+        board[r][c][1] = 0
         return
-    coords[idx] = [r+dr, c+dc]
-    board[r][c][1] -= 1
-    board[r+dr][c+dc][1] += 1
-    result += 1
+    action[r+dr][c+dc] += board[r][c][1]
+    result += board[r][c][1]
+    board[r][c][1] = 0
     return
 
 def get_bbox():
-    global board, alive, exit, coords
+    global board, alive, exit, coords, N
     er, ec = exit
     dist = 999999
     bbox = [9999, 9999, 9999, 9999]
@@ -102,7 +104,6 @@ def get_bbox():
         if length > dist:
             continue
         # 가장 작은 크기 정사각형 2개 이상 -> r, c 따라 우선순위.
-        dist = length
         if ir <= er:
             ltr = er - length
             rbr = er
@@ -110,11 +111,11 @@ def get_bbox():
                 ltr = 1
                 rbr = ltr + length
         else:
-            ltr = er
-            rbr = er + length
-            if rbr > N:
-                rbr = N
-                ltr = rbr - length
+            ltr = ir - length
+            rbr = ir
+            if ltr <= 0:
+                ltr = 1
+                rbr = ltr + length
         if ic <= ec:
             ltc = ec - length
             rbc = ec
@@ -122,14 +123,17 @@ def get_bbox():
                 ltc = 1
                 rbc = ltc + length
         else:
-            ltc = ec
-            rbc = ec + length
-            if rbc > N:
-                rbc = N
-                ltc = rbc - length
-        if ltr < bbox[0]:
+            ltc = ic - length
+            rbc = ic
+            if ltc <= 0:
+                ltc = 1
+                rbc = ltc + length
+        if length < dist:
+            dist = length
             bbox = [ltr, ltc, rbr, rbc]
-        elif ltc < bbox[1]:
+        elif ltr < bbox[0]:
+            bbox = [ltr, ltc, rbr, rbc]
+        elif ltr == bbox[0] and ltc < bbox[1]:
             bbox = [ltr, ltc, rbr, rbc]
 
     return bbox
@@ -182,6 +186,7 @@ result = 0
 miro = [list(map(int, input().split())) for _ in range(N)]
 coords = [list(map(int, input().split())) for _ in range(M)]
 exit = list(map(int, input().split()))
+action = [[0] * (N+1) for _ in range(N+1)]
 people = {}
 for r in range(1, N+1):
     for c in range(1, N+1):
@@ -190,9 +195,8 @@ for r in range(1, N+1):
 for i, c in enumerate(coords):
     cr, cc = c
     board[cr][cc][1] += 1
-    people[i] = [cr, cc]
 
-# board, alive, exit, coords, result 사용.
+# board, alive, exit, coords, result, action 사용.
 
 board[exit[0]][exit[1]][0] = -1
 print_3d_graph('board0', board, 0)
@@ -200,16 +204,17 @@ print_3d_graph('board1', board, 1)
 print_dict('people', people)
 print_debug('exit', exit)
 
+flag = True
 # K초동안 진행.
 for k in range(K):
     # 모든 참가자 이동.
+    update_coords()
     if len(coords) == 0:
         print(result)
         print(exit[0], exit[1])
+        flag=False
         break
     for idx, coord in enumerate(coords):
-        if coords == [0, 0]:
-            continue
         # 현재 참가자 좌표
         cr, cc = coord
         # 현재 참가자에서 출구까지 최단거리가 가장 가까운 방향.
@@ -217,7 +222,17 @@ for k in range(K):
         move_person(idx, cr, cc, *dir)
         # print_3d_graph(f'[Time {k}, idx {idx}] board', board)
         print_debug(f'[Time {k}, idx {idx}, cr: {cr}, cc: {cc}, dir {dir}] coords', coords)
+    for r in range(1, N+1):
+        for c in range(1, N+1):
+            if action[r][c] != 0:
+                board[r][c][1] += action[r][c]
+
     update_coords()
+    if len(coords) == 0:
+        print(result)
+        print(exit[0], exit[1])
+        flag=False
+        break
     # 보드 회전 좌표 획득
     bbox = get_bbox()
     print_debug(f'[Time {k}] bbox', bbox)
@@ -227,8 +242,8 @@ for k in range(K):
     rotate_board(*bbox)
     print_3d_graph(f'[Time {k}] after rotation board 0', board, 0)
     print_3d_graph(f'[Time {k}] after rotation board 1', board, 1)
-    update_coords()
     print_debug(f'[Time {k} Done. ]. result: {result}, exit: {exit}, coords: {coords}')
 
-print(result)
-print(exit[0], exit[1])
+if flag:
+    print(result)
+    print(exit[0], exit[1])
