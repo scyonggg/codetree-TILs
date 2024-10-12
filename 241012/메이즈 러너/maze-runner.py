@@ -154,8 +154,8 @@ def rotate_board(r1, c1, r2, c2):
     """
     for r in range(length):
         for c in range(length):
-            target0[c][-r-1] = board[r1+r][c1+c][0]
-            target1[c][-r-1] = board[r1+r][c1+c][1]
+            target0[c][length-r-1] = board[r1+r][c1+c][0]
+            target1[c][length-r-1] = board[r1+r][c1+c][1]
 
     print_2d_graph('target0', target0)
     print_2d_graph('target1', target1)
