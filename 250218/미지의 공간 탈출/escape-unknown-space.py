@@ -73,21 +73,20 @@ def add_huddles(flatten_board):
                 global_exit = [r, c]
                 # 동
                 if c == un_c+M+1:
-                    r -= un_r+1
-                    flatten_board[r+M+1][L-1] = 10
+                    tr = r - un_r
+                    flatten_board[M+tr][L-1] = 10
                 # 서
                 elif c == un_c:
-                    r -= un_r+1
-                    flatten_board[r+M+1][0] = 10
+                    tr = r - un_r
+                    flatten_board[M+tr][0] = 10
                 # 남
                 elif r == un_r+M+1:
-                    c -= un_c+1
-                    flatten_board[L-1][c+M+1] = 10
+                    tc = c - un_c
+                    flatten_board[L-1][M+tc] = 10
                 # 북
                 elif r == un_r:
-                    c -= un_c+1
-                    flatten_board[0][c+M+1] = 10
-    # debug_2d(flatten_board)
+                    tc = c - un_c
+                    flatten_board[0][M+tc] = 10
     return flatten_board
 
 def debug_2d(graph):
