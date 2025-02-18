@@ -178,6 +178,8 @@ def get_odd_visit_board():
                 nr += 1
             elif d == 3:  # 북
                 nr -= 1
+            if not (0 <= nr < N and 0 <= nc < N):
+                break
             if board[nr][nc] == 0:  # 빈 공간이 아니면 확산되지 않는다.
                 visit_board[nr][nc] = time * v
             else:
