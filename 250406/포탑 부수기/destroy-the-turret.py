@@ -1,6 +1,7 @@
 from collections import deque
 
 DEBUG=False
+# DEBUG=True
 
 def debug_2d(graph, text: str=None):
     if not DEBUG:
@@ -165,7 +166,6 @@ def cannon_attack(attacker, target):
     # 주변 8개 포탑
     for i in (-1, 0, 1):
         for j in (-1, 0, 1):
-            print(f'i: {i}, j: {j}')
             r = (tr + i + N) % N
             c = (tc + j + M) % M
             if boards[r][c] <= 0:
@@ -204,12 +204,13 @@ def play_one_turn(k) -> bool:
     debug_2d(boards, f'Before turn #{k}, boards:')
     # 1. 공격자 선정
     attacker = get_attacker()
-    # 공격자 핸디캡 부여 및 공격시점 업데이트
-    attacker_update(attacker, k)
     # 2. 공격자 공격 (타겟 선정)
     target = get_target()
+    # 공격자 핸디캡 부여 및 공격시점 업데이트
+    attacker_update(attacker, k)
     # 레이저 공격 시도.
     path = raser_path(attacker, target)
+    debug_2d(boards, f'During turn #{k}, {debug_2d(boards, "boards")} attacker : {attacker}, target : {target}, path: {path}')
     if len(path) > 0:
         raser_attack(path, attacker, target)
     else:  # 포탄 공격 시도
