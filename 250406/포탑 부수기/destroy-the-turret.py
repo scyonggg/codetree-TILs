@@ -140,16 +140,18 @@ def raser_path(attacker, target):
                 visit[nr][nc] = visit[cr][cc] + 1
     return []
 
-def raser_attack(path, attacker):
+def raser_attack(path, attacker, target):
     ar, ac = attacker
+    tr, tc = target
     ap = boards[ar][ac]
     l = len(path)
     # 타겟까지 경로에 있는 포탑
-    for i in range(1, l-1):
+    for i in range(l-1):
         r, c = path[i]
+        if (r == ar and c == ac) or (r == tr and c == tc):
+            continue
         boards[r][c] -= ap // 2
     # 타겟 포탑
-    tr, tc = path[-1]
     boards[tr][tc] -= ap
     return
 
@@ -170,7 +172,7 @@ def cannon_attack(attacker, target):
                 continue
             related_towers.append([r, c])
             # 타겟 포탑 및 공격자 포탑은 생략
-            if (i == 0 and j == 0) or (r == ar and c == ac):
+            if (r == tr and c == tc) or (r == ar and c == ac):
                 continue
             boards[r][c] -= ap // 2
 
@@ -186,8 +188,6 @@ def check_alive():
                 boards[r][c] = 0
             else:
                 cnt += 1
-    if cnt == 0:
-        raise ValueError(f"check_alive(), cnt is {cnt}.")
     return cnt
 
 def repair_towers(path):
@@ -211,7 +211,7 @@ def play_one_turn(k) -> bool:
     # 레이저 공격 시도.
     path = raser_path(attacker, target)
     if len(path) > 0:
-        raser_attack(path, attacker)
+        raser_attack(path, attacker, target)
     else:  # 포탄 공격 시도
         path = cannon_attack(attacker, target)
     # 3. 포탑 부서짐 (포탑 생존 확인)
