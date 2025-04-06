@@ -163,7 +163,7 @@ def cannon_attack(attacker, target):
     # 주변 8개 포탑
     for i in (-1, 0, 1):
         for j in (-1, 0, 1):
-            related_towers.append([i, j])
+            related_towers.append([tr + i, tc + j])
             # 타겟 포탑 및 공격자 포탑은 생략
             if (i == 0 and j == 0) or (i == ar and j == ac):
                 continue
