@@ -88,48 +88,56 @@ def medusa_view(r, c, dir):
 def warrior_view(medusa_pov, stoned_warriors):
     for stoned_warrior in stoned_warriors:
         r, c, wd = stoned_warrior
-        for wr in range(N):
-            for wc in range(N):
-                if medusa_pov[wr][wc] == 0:
-                    continue
-                
-                if wd == [0, 0]:  # 상상
-                    if 0 <= wr < r and wc == c:
-                        medusa_pov[wr][wc] = 0
-                elif wd == [0, 2]:  # 상좌
-                    if 0 <= wr < r and wr - r + c <= wc <= c:
-                        medusa_pov[wr][wc] = 0
-                elif wd == [0, 3]:  # 상우
-                    if 0 <= wr < r and c <= wc <= -wr + r + c:
-                        medusa_pov[wr][wc] = 0
-                elif wd == [1, 1]:  # 하하
-                    if r < wr <= N-1 and wc == c:
-                        medusa_pov[wr][wc] = 0
-                elif wd == [1, 2]:  # 하좌
-                    if r < wr <= N-1 and -wr + r + c <= wc <= c:
-                        medusa_pov[wr][wc] = 0
-                elif wd == [1, 3]:  # 하우
-                    if r < wr <= N-1 and c <= wc <= wr - r + c:
-                        medusa_pov[wr][wc] = 0
-                elif wd == [2, 2]:  # 좌좌
-                    if 0 <= wc < c and wr == r:
-                        medusa_pov[wr][wc] = 0
-                elif wd == [2, 0]:  # 좌상
-                    if 0 <= wc < c and wc + r - c <= wr <= r:
-                        medusa_pov[wr][wc] = 0
-                elif wd == [2, 1]:  # 좌하
-                    if 0 <= wc < c and r <= wr <= -wc + r + c:
-                        medusa_pov[wr][wc] = 0
-                elif wd == [3, 3]:  # 우우
-                    if c < wc <= N-1 and wr == r:
-                        medusa_pov[wr][wc] = 0
-                elif wd == [3, 0]:  # 우상
-                    if c < wc <= N-1 and -wc + r + c <= wr <= r:
-                        medusa_pov[wr][wc] = 0
-                elif wd == [3, 1]:  # 우하
-                    if c < wc <= N-1 and r <= wr <= wc + r - c:
-                        medusa_pov[wr][wc] = 0
+        if wd == [0, 0]:  # 상상
+            wc = c
+            for wr in range(0, r):
+                medusa_pov[wr][wc] = 0
+        elif wd == [0, 2]:  # 상좌
+            for wr in range(0, r):
+                for wc in range(wr - r + c, c + 1):
+                    medusa_pov[wr][wc] = 0
+        elif wd == [0, 3]:  # 상우
+            for wr in range(0, r):
+                for wc in range(c, -wr + r + c + 1):
+                    medusa_pov[wr][wc] = 0
+        elif wd == [1, 1]:  # 하하
+            wc = c
+            for wr in range(r+1, N):
+                medusa_pov[wr][wc] = 0
+        elif wd == [1, 2]:  # 하좌
+            for wr in range(r+1, N):
+                for wc in range(-wr+r+c, c+1):
+                    medusa_pov[wr][wc] = 0
+        elif wd == [1, 3]:  # 하우
+            for wr in range(r+1, N):
+                for wc in range(c, wr - r + c + 1):
+                    medusa_pov[wr][wc] = 0
+        elif wd == [2, 2]:  # 좌좌
+            wr = r
+            for wc in range(0, c):
+                medusa_pov[wr][wc] = 0
+        elif wd == [2, 0]:  # 좌상
+            for wc in range(0, c):
+                for wr in range(wc + r - c, r+1):
+                    medusa_pov[wr][wc] = 0
+        elif wd == [2, 1]:  # 좌하
+            for wc in range(0, c):
+                for wr in range(r, -wc + r + c + 1):
+                    medusa_pov[wr][wc] = 0
+        elif wd == [3, 3]:  # 우우
+            wr = r
+            for wc in range(c+1, N):
+                medusa_pov[wr][wc] = 0
+        elif wd == [3, 0]:  # 우상
+            for wc in range(c+1, N):
+                for wr in range(-wc + r + c, r+1):
+                    medusa_pov[wr][wc] = 0
+        elif wd == [3, 1]:  # 우하
+            for wc in range(c+1, N):
+                for wr in range(r, wc+r-c+1):
+                    medusa_pov[wr][wc] = 0
     return medusa_pov
+
 
 def get_stoned_warriors(medusa_pov):
     stoned_warriors = []
