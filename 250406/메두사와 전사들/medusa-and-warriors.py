@@ -1,35 +1,5 @@
 from collections import deque
 
-DEBUG=False
-# DEBUG=True
-
-def debug_always(graph, text: str=None):
-    if text is not None:
-        print(text)
-    for g in graph:
-        print(g)
-    print()
-
-def debug_warriors(text: str=None):
-    if not DEBUG:
-        return
-    if text is not None:
-        print(text)
-    board = [[0] * N for _ in range(N)]
-    for warrior in warriors:
-        r, c = warrior
-        board[r][c] += 1
-    debug_2d(board)
-
-def debug_2d(graph, text: str=None):
-    if not DEBUG:
-        return
-    if text is not None:
-        print(text)
-    for g in graph:
-        print(g)
-    print()
-
 def get_distance(r1, c1, r2, c2):
     return abs(r1 - r2) + abs(c1 - c2)
 
@@ -59,6 +29,8 @@ def medusa_view(r, c, dir):
     stoned_warriors = []
     for br in range(N):
         for bc in range(N):
+            if board[br][bc] == 1:
+                continue
             if dir == 0 and 0 <= br < r:  # 상
                 if br - r + c <= bc < c:  # 상좌
                     if [br, bc] in warriors:
@@ -118,6 +90,9 @@ def warrior_view(medusa_pov, stoned_warriors):
         r, c, wd = stoned_warrior
         for wr in range(N):
             for wc in range(N):
+                if medusa_pov[wr][wc] == 0:
+                    continue
+                
                 if wd == [0, 0]:  # 상상
                     if 0 <= wr < r and wc == c:
                         medusa_pov[wr][wc] = 0
@@ -170,7 +145,6 @@ def move_warriors(medusa_pov, medusa_r, medusa_c, stoned_warriors, ans_per_turn)
     for warrior in warriors:
         if warrior in stoned_warriors:
             new_warriors.append(warrior)
-            # print(f'warrior {warrior} is in stoned_warriors {stoned_warriors}')
             continue
         r, c = warrior
         if 0 <= r-1 <= N-1 and get_distance(medusa_r, medusa_c, r-1, c) < get_distance(medusa_r, medusa_c, r, c) and medusa_pov[r-1][c] == 0:  # 상으로 갈 수 있는 경우.
@@ -187,7 +161,6 @@ def move_warriors(medusa_pov, medusa_r, medusa_c, stoned_warriors, ans_per_turn)
             new_warriors.append([r, c+1])
         else:
             new_warriors.append(warrior)
-    # print(f'new_warriors', new_warriors)
     warriors = new_warriors
     return ans_per_turn
 
@@ -197,7 +170,6 @@ def move_warriors_2nd(medusa_pov, medusa_r, medusa_c, stoned_warriors, ans_per_t
     for warrior in warriors:
         if warrior in stoned_warriors:
             new_warriors.append(warrior)
-            # print(f'warrior {warrior} is in stoned_warriors {stoned_warriors}')
             continue
         r, c = warrior
         if 0 <= c-1 <= N-1 and get_distance(medusa_r, medusa_c, r, c-1) < get_distance(medusa_r, medusa_c, r, c) and medusa_pov[r][c-1] == 0:  # 좌로 갈 수 있는 경우.
@@ -214,7 +186,6 @@ def move_warriors_2nd(medusa_pov, medusa_r, medusa_c, stoned_warriors, ans_per_t
             new_warriors.append([r+1, c])
         else:
             new_warriors.append(warrior)
-    # print(f'new_warriors', new_warriors)
     warriors = new_warriors
     return ans_per_turn
 
@@ -232,7 +203,6 @@ def attack_warriors(medusa_r, medusa_c, ans_per_turn):
 def main():
     # 0. 메두사 최단 경로 계산
     shortest_path, shortest_visit = bfs()
-    debug_2d(shortest_visit, f'shortest_path : {shortest_path}')
     if len(shortest_path) == 0:
         print(-1)
         return
@@ -254,8 +224,6 @@ def main():
         for d in range(4):
             ## 각 방향에 대한 메두사 시선
             medusa_pov, stoned_warriors = medusa_view(medusa_r, medusa_c, d)
-            # debug_warriors(f'warriors:')
-            # debug_2d(medusa_pov, f'mr, mc : {medusa_r, medusa_c}, warriors: {warriors}, stoned_warriors: {stoned_warriors}, dir : {d}')
             ## 전사에 의해 가려진 메두사 시선
             medusa_pov = warrior_view(medusa_pov, stoned_warriors)
             ## 가려진 메두사 시선에서 굳은 전사의 수
@@ -264,21 +232,15 @@ def main():
                 max_stoned_warriors = stoned_warriors
                 max_medusa_pov = medusa_pov
                 max_dir = d
-        debug_2d(max_medusa_pov, f'mr, mc : {medusa_r, medusa_c}, warriors: {warriors}, stoned_warriors: {max_stoned_warriors}, dir : {max_dir}')
         ans_per_turn[1] += len(max_stoned_warriors)
         # 3. 전사 이동.
-        debug_warriors(f'[0] warriors:')
         ans_per_turn = move_warriors(max_medusa_pov, medusa_r, medusa_c, max_stoned_warriors, ans_per_turn)
         # 4. 전사 공격
-        debug_warriors(f'[1] warriors:')
         ans_per_turn = attack_warriors(medusa_r, medusa_c, ans_per_turn)
         # 전사 이동 한 번 더.
-        debug_warriors(f'[2] warriors:')
         ans_per_turn = move_warriors_2nd(max_medusa_pov, medusa_r, medusa_c, max_stoned_warriors, ans_per_turn)
-        debug_warriors(f'[3] warriors:')
         # 전사 공격 한 번 더.
         ans_per_turn = attack_warriors(medusa_r, medusa_c, ans_per_turn)
-        debug_warriors(f'[4] warriors:')
         print(' '.join(map(str, ans_per_turn)))
 
     return
@@ -290,5 +252,4 @@ if __name__ == '__main__':
     tmp = list(map(int, input().split()))
     warriors = [tmp[i: i+2] for i in range(0, len(tmp), 2)]
     roads = [list(map(int, input().split())) for _ in range(N)]
-    # debug_always(roads, 'roads')
     main()
