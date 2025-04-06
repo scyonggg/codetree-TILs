@@ -31,8 +31,7 @@ def get_attacker():
                 min_val = boards[r][c]
     if len(min_towers) == 1:
         return min_towers[0]
-    # 2. 공격력 가장 낮은 포탑이 2개 이상
-    ## 가장 최근에 공격한 포탑 찾기
+    # 2. 가장 최근에 공격한 포탑 찾기
     max_val = -1
     ret_towers = []
     for tower in min_towers:
@@ -48,17 +47,17 @@ def get_attacker():
     if len(ret_towers) == 1:
         return ret_towers[0]
     # 3. 행과 열의 합이 가장 큰 포탑 찾기
-    min_val = 9999999999
+    max_val = -1
     min_towers = ret_towers
     ret_towers = []
     for tower in min_towers:
         sums = sum(tower)
-        if sums <= min_val:
-            if sums == min_val:
+        if sums >= max_val:
+            if sums == max_val:
                 ret_towers.append(tower)
             else:
                 ret_towers = [tower]
-            min_val = sums
+            max_val = sums
     if len(ret_towers) == 1:
         return ret_towers[0]
     # 4. 열 값이 가장 큰 포탑 찾기
