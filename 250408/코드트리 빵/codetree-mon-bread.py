@@ -19,6 +19,34 @@ def debug_2d(graph, text: str=None):
 def get_dist(r1, c1, r2, c2):
     return abs(r1 - r2) + abs(c1 - c2)
 
+def get_shortest_dist(src):
+    # src와 가장 가까운 베이스캠프 리턴
+    sr, sc = src
+    visit = [[False] * n for _ in range(n)]
+    visit[sr][sc] = True
+    q = deque()
+    q.append([sr, sc, 0])
+    candidate = []
+    min_len = 9999999999
+    while q:
+        cr, cc, cd = q.popleft()
+        for dr, dc in zip((0, 0, 1, -1), (1, -1, 0, 0)):
+            nr, nc = cr + dr, cc + dc
+            if 0 <= nr < n and 0 <= nc < n and not visit[nr][nc] and boards[nr][nc] != -1:
+                if boards[nr][nc] == 1:
+                    if cd + 1 == min_len:
+                        candr, candc = candidate
+                        if nr < candr:
+                            candidate = [nr, nc]
+                        elif nr == candr and nc < candc:
+                            candidate = [nr, nc]
+                    elif cd + 1 < min_len:
+                        candidate = [nr, nc]
+                        min_len = cd + 1
+                visit[nr][nc] = True
+                q.append([nr, nc, cd + 1])
+    return candidate
+
 def get_shortest_path(src, dst):
     sr, sc = src
     destr, destc = dst
@@ -64,16 +92,7 @@ def check_finished():
     return True
 
 def get_closest_basecamp(t):
-    destr, destc = stores[t]
-    min_dist = 99999999999
-    target = []
-    for r in range(n):
-        for c in range(n):
-            if boards[r][c] == 1:  # 베이스캠프 찾기
-                dist = get_dist(r, c, destr, destc)  # 목표 편의점과 최단거리 계산
-                if dist < min_dist:
-                    min_dist = dist
-                    target = [r, c]
+    target = get_shortest_dist(stores[t])  # stores[t]에서 최단거리의 베이스캠프
     boards[target[0]][target[1]] = -1  # 해당 베이스캠프 이동 불가
     return target
 
