@@ -19,11 +19,6 @@ def debug_2d(graph, text: str=None):
 def get_dist(r1, c1, r2, c2):
     return abs(r1 - r2) + abs(c1 - c2)
 
-def get_movable_people():
-    if movable_people:
-        return movable_people
-    return {}
-
 def get_shortest_path(src, dst):
     sr, sc = src
     destr, destc = dst
@@ -54,6 +49,8 @@ def move_people():
 
 def check_arrived():
     for i, store in enumerate(stores):
+        if i == 0:
+            continue
         if i in movable_people and movable_people[i] == store:  # 편의점에 도착
             del movable_people[i]  # 이동 가능한 사람 명단에서 제거
             boards[store[0]][store[1]] = -1  # 해당 편의점 이동 불가
@@ -61,19 +58,19 @@ def check_arrived():
     return
 
 def check_finished():
-    for k, v in done.items():
+    for v in done.values():
         if not v:
             return False
     return True
 
 def get_closest_basecamp(t):
-    dr, dc = stores[t]
+    destr, destc = stores[t]
     min_dist = 99999999999
     target = []
     for r in range(n):
         for c in range(n):
             if boards[r][c] == 1:  # 베이스캠프 찾기
-                dist = get_dist(r, c, dr, dc)  # 목표 편의점과 최단거리 계산
+                dist = get_dist(r, c, destr, destc)  # 목표 편의점과 최단거리 계산
                 if dist < min_dist:
                     min_dist = dist
                     target = [r, c]
