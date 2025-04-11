@@ -54,10 +54,32 @@ def bfs(src):
                     tr, tc = nr, nc
     return cpath + [[tr, tc]]
 
+def dfs(src):
+    sr, sc = src
+    visit = [[False] * n for _ in range(n)]
+    visit[sr][sc] = True
+    q = deque()
+    q.append([sr, sc, [[sr, sc]]])
+    tr, tc = -1, -1
+    cpath = []
+    while q:
+        cr, cc, cpath = q.pop()
+        for dr, dc in zip((0, 0, -1, 1), (-1, 1, 0, 0)):
+            nr, nc = cr + dr, cc + dc
+            if 0 <= nr < n and 0 <= nc < n and not visit[nr][nc]:
+                if board[nr][nc] == 2:  # 다음 사람
+                    visit[nr][nc] = True
+                    q.append([nr, nc, cpath + [[nr, nc]]])
+                elif board[nr][nc] == 3:  # 꼬리 사람
+                    visit[nr][nc] = True
+                    tr, tc = nr, nc
+    return cpath + [[tr, tc]]
+
 def find_groups(heads):
     groups = []
     for head in heads:
-        p = bfs(head)
+        p = dfs(head)
+        # p = bfs(head)
         groups.append(p)
     return groups
 
