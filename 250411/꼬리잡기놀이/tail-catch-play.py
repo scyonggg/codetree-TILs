@@ -180,14 +180,33 @@ def check_hit(ball_path, groups):
     tmp = map_people(groups)
     for path in ball_path:  # path는 공의 진행 방향 순서.
         r, c = path
-        if tmp[r][c] != -1:  # 던진 공에 사람 맞았음.
-            # 점수 획득
-            cal_score(tmp[r][c], r, c, groups)
-            # cal_score(r, c, groups)
-            # 방향 전환
-            change_direction(tmp[r][c], groups)
-            return
+        for i, group in enumerate(groups):
+            if [r, c] in group:
+                cal_score(i, r, c, groups)
+                change_direction(i, groups)
+                return
+        # if tmp[r][c] != -1:  # 던진 공에 사람 맞았음.
+        #     # 점수 획득
+        #     cal_score(tmp[r][c], r, c, groups)
+        #     # cal_score(r, c, groups)
+        #     # 방향 전환
+        #     change_direction(tmp[r][c], groups)
     return
+#
+# def check_hit(ball_path, groups):
+#     # ball_path에 사람이 맞는지 확인. 맞았다면 점수 획득, 방향 전환 수행.
+#     # n x n에 그룹원 번호 매핑
+#     tmp = map_people(groups)
+#     for path in ball_path:  # path는 공의 진행 방향 순서.
+#         r, c = path
+#         if tmp[r][c] != -1:  # 던진 공에 사람 맞았음.
+#             # 점수 획득
+#             cal_score(tmp[r][c], r, c, groups)
+#             # cal_score(r, c, groups)
+#             # 방향 전환
+#             change_direction(tmp[r][c], groups)
+#             return
+#     return
 
 def play_round(i):
     # i번째 라운드 진행.
