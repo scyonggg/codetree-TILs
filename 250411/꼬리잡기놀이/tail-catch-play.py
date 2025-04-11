@@ -35,23 +35,24 @@ def find_head():
 
 def bfs(src):
     sr, sc = src
-    visit = [[0] * n for _ in range(n)]
-    visit[sr][sc] = 1
+    visit = [[False] * n for _ in range(n)]
+    visit[sr][sc] = True
     q = deque()
     q.append([sr, sc, [[sr, sc]]])
+    tr, tc = -1, -1
+    cpath = []
     while q:
         cr, cc, cpath = q.popleft()
         for dr, dc in zip((0, 0, 1, -1), (-1, 1, 0, 0)):
             nr, nc = cr + dr, cc + dc
-            if 0 <= nr < n and 0 <= nc < n and visit[nr][nc] == 0:
+            if 0 <= nr < n and 0 <= nc < n and not visit[nr][nc]:
                 if board[nr][nc] == 2:  # 다음 사람
-                    visit[nr][nc] = visit[cr][cc] + 1
+                    visit[nr][nc] = True
                     q.append([nr, nc, cpath + [[nr, nc]]])
                 elif board[nr][nc] == 3:  # 꼬리 사람
-                    visit[nr][nc] = visit[cr][cc] + 1
-                    return cpath + [[nr, nc]]
-
-    raise ValueError(f'Cannot find tail person.')
+                    visit[nr][nc] = True
+                    tr, tc = nr, nc
+    return cpath + [[tr, tc]]
 
 def find_groups(heads):
     groups = []
@@ -66,11 +67,11 @@ def move_head(groups):
         head, tail = group[0], group[-1]
         hr, hc = head
         tr, tc = tail
-        # head에서 시작. 주변에서 이동 선 (4)를 찾음.
+        # head에서 시작. 주변에서 다음 이동할 지역을 찾음. 이 때, 꼬리사람 (3)일수도 있고 이동 선 (4)일수도 있음..
         nr, nc = -1, -1
         for dr, dc in zip((0, 0, -1, 1), (1, -1, 0, 0)):
             nr, nc = hr + dr, hc + dc
-            if 0 <= nr < n and 0 <= nc < n and board[nr][nc] == 4:
+            if 0 <= nr < n and 0 <= nc < n and (board[nr][nc] == 3 or board[nr][nc] == 4):
                 break
         # 이전 head 및 tail 처리
         board[hr][hc] = 2
